@@ -1,7 +1,8 @@
 FROM ubuntu:21.04
 
-# Decrease number of pacakges and do cleanup afterwards
-RUN apt-get update && apt-get install -y xorg xterm  xserver-xorg-input-evdev xserver-xorg-input-all
+# Decrease number of pacakges 
+RUN apt-get update && \
+    DEBIAN_FRONTEND='noninteractive'  apt-get install -y  --no-install-recommends xorg xserver-xorg-input-evdev  xserver-xorg-input-all
 
 # TODO: keyboard should be configurable in runtime
 # TODO: actually move all input related functionality to separate layer
@@ -32,4 +33,11 @@ RUN apt-get update && apt-get install -y xorg xterm  xserver-xorg-input-evdev xs
 #EndSection\n\
 #" > /etc/X11/xorg.conf.d/10-input.conf
 
-CMD /usr/bin/xinit /usr/bin/xterm -- :0 -nolisten tcp vt1
+#CMD /usr/bin/xinit /usr/bin/xterm -- :0 -nolisten tcp vt1
+#CMD /usr/bin/X :0 -nolisten tcp vt1
+
+ADD entrypoint.sh /usr/bin/entrypoint.sh
+
+RUN chmod +x /usr/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]

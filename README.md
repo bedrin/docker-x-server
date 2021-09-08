@@ -11,10 +11,19 @@ Requires `--privileged` flag when running a container.
 docker build . -t docker-x-server:latest
 ```
 
-Default CMD runs `xterm` and can be used to quickly test the container.
-
+You can start container either in privileged mode:
 ```
 docker run --name docker-x-server --privileged docker-x-server:latest
+```
+
+Or my granting `SYS_TTY_CONFIG` capability and mapping a few video related devices:
+```
+docker run --name docker-x-server --device=/dev/input --device=/dev/console --device=/dev/dri --device=/dev/fb0 --device=/dev/tty --device=/dev/tty1 --device=/dev/vga_arbiter --device=/dev/snd  --device=/dev/psaux --cap-add=SYS_TTY_CONFIG docker-x-server:latest
+```
+
+If you pass an argument, it would be executed using `xinit` which allows you to test it quickly by say running `xeyes`
+```
+docker run --name docker-x-server --device=/dev/input --device=/dev/console --device=/dev/dri --device=/dev/fb0 --device=/dev/tty --device=/dev/tty1 --device=/dev/vga_arbiter --device=/dev/snd  --device=/dev/psaux --cap-add=SYS_TTY_CONFIG docker-x-server:latest /usr/bin/xeyes
 ```
 
 # Limitations
@@ -46,4 +55,16 @@ RUN chmod +x /usr/local/bin/jellyfin-mpv-shim-wrapper
 CMD /usr/bin/xinit /usr/local/bin/jellyfin-mpv-shim-wrapper -- :0 -nolisten tcp vt1
 ```
 
-Another option is to run the actual application in separate container and share the X11 socket between them.P
+Another option is to run the actual application in separate container and share the X11 socket between them:
+
+```
+docker volume create --name xsocket
+```
+
+```
+docker run --name docker-x-server --device=/dev/input --device=/dev/console --device=/dev/dri --device=/dev/fb0 --device=/dev/tty --device=/dev/tty1 --device=/dev/vga_arbiter --device=/dev/snd  --device=/dev/psaux --cap-add=SYS_TTY_CONFIG  -v xsocket:/tmp/.X11-unix  -d  docker-x-server:latest
+```
+
+```
+docker run --rm -it -e DISPLAY=:0 -v xsocket:/tmp/.X11-unix:ro stefanscherer/xeyes
+```

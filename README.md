@@ -26,10 +26,15 @@ If you pass an argument, it would be executed using `xinit` which allows you to 
 docker run --name docker-x-server --device=/dev/input --device=/dev/console --device=/dev/dri --device=/dev/fb0 --device=/dev/tty --device=/dev/tty1 --device=/dev/vga_arbiter --device=/dev/snd  --device=/dev/psaux --cap-add=SYS_TTY_CONFIG docker-x-server:latest /usr/bin/xeyes
 ```
 
-# Limitations
+If you need input (like keyboard or mouse) you also need to bind `/run/udev/data` folder to your container:
+```
+```
+docker run --name docker-x-server --device=/dev/input --device=/dev/console --device=/dev/dri --device=/dev/fb0 --device=/dev/tty --device=/dev/tty1 --device=/dev/vga_arbiter --device=/dev/snd  --device=/dev/psaux --cap-add=SYS_TTY_CONFIG  -v /run/udev/data:/run/udev/data docker-x-server:latest
+```
 
-Since `udev` isn't available in Docker containers, you need to setup input methods like keyboard and mouse manually.
-If you need keyboard, find the event number for your keyboard (like `/dev/input/event4`), uncomment the relevant section in `Dockerfile`, update the Device Option for keyboard accordingly and rebuild the image.
+# Advanced
+
+If on whatever reason you do not want to use `udev` for input methods, find the event number for your keyboard (like `/dev/input/event4`), uncomment the relevant section in `Dockerfile`, update the Device Option for keyboard accordingly and rebuild the image.
 
 # Usage
 
@@ -62,7 +67,7 @@ docker volume create --name xsocket
 ```
 
 ```
-docker run --name docker-x-server --device=/dev/input --device=/dev/console --device=/dev/dri --device=/dev/fb0 --device=/dev/tty --device=/dev/tty1 --device=/dev/vga_arbiter --device=/dev/snd  --device=/dev/psaux --cap-add=SYS_TTY_CONFIG  -v xsocket:/tmp/.X11-unix  -d  docker-x-server:latest
+docker run --name docker-x-server --device=/dev/input --device=/dev/console --device=/dev/dri --device=/dev/fb0 --device=/dev/tty --device=/dev/tty1 --device=/dev/vga_arbiter --device=/dev/snd  --device=/dev/psaux --cap-add=SYS_TTY_CONFIG  -v xsocket:/tmp/.X11-unix  -v /run/udev/data:/run/udev/data -d  docker-x-server:latest
 ```
 
 ```

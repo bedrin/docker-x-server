@@ -28,7 +28,6 @@ docker run --name docker-x-server --device=/dev/input --device=/dev/console --de
 
 If you need input (like keyboard or mouse) you also need to bind `/run/udev/data` folder to your container:
 ```
-```
 docker run --name docker-x-server --device=/dev/input --device=/dev/console --device=/dev/dri --device=/dev/fb0 --device=/dev/tty --device=/dev/tty1 --device=/dev/vga_arbiter --device=/dev/snd  --device=/dev/psaux --cap-add=SYS_TTY_CONFIG  -v /run/udev/data:/run/udev/data docker-x-server:latest
 ```
 
